@@ -1,20 +1,29 @@
 def main():
     expression = input("Expression: ")
 
-    x, y, z = expression.split(" ")
+    try:
+        x, y, z = expression.split(" ")
+    except ValueError:
+        print("Invalid format. Use spaces, like: 1 + 1")
+        return
 
-    result = calculate(x, y, z)
-
-    if result is not None:
-        print(f"{result:.1f}")
+    try:
+        result = calculate(x, y, z)
+    except ZeroDivisionError:
+        print("Cannot divide by zero.")
+    except ValueError:
+        print("Both operands must be numbers.")
     else:
-        print("Invalid operation or division by zero.")
+        if result is None:
+            print("Invalid operator. Use +, -, * or /.")
+        else:
+            print(f"{result:.1f}")
 
 
 def calculate(x, y, z):
     x = float(x)
     z = float(z)
-    
+
     if y == "+":
         return x + z
     elif y == "-":
@@ -22,10 +31,7 @@ def calculate(x, y, z):
     elif y == "*":
         return x * z
     elif y == "/":
-        if z == 0:
-            return None
-        else:
-            return x / z
+        return x / z
     else:
         return None
 
