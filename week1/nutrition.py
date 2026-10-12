@@ -11,6 +11,7 @@ CALORIES = {
 }
 
 def main():
+    # strip added to remove any leading or trailing whitespace from the input
     fruit = input("Item: ").strip().lower()
     calories = CALORIES.get(fruit)
     if calories is not None:
