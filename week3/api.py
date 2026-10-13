@@ -6,18 +6,23 @@ if len(sys.argv) != 2:
 
 try:
     response = requests.get(
-    "https://itunes.apple.com/search",
-    params={"entity": "song", "limit": 20, "term": sys.argv[1]},
-    timeout=10,
-)
+        "https://itunes.apple.com/search",
+        params={
+            "entity": "song",
+            "limit": 20,
+            "term": sys.argv[1]
+        },
+        timeout=10,
+    )
     response.raise_for_status()
+
 except requests.exceptions.RequestException as e:
     sys.exit(f"Network error: {e}")
 
-#print(json.dumps(response.json(), indent=4))
-
 data = response.json()
 
-if data["results"] is not None:
-    for result in data["results"]:
-        print(result["trackName"])
+if not data["results"]:
+    sys.exit("No tracks found.")
+
+for result in data["results"]:
+    print(result["trackName"])
