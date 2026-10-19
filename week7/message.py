@@ -1,4 +1,8 @@
 
+class InvalidMessageError(ValueError):
+    """Raised when a Message has invalid data."""
+
+
 class Message:
     ROLES = ("user", "assistant")
 
@@ -13,7 +17,9 @@ class Message:
     @role.setter
     def role(self, value):
         if value not in Message.ROLES:
-            raise ValueError("Role must be 'user' or 'assistant'")
+            raise InvalidMessageError(
+                "Role must be 'user' or 'assistant'"
+            )
         self._role = value
 
     @property
@@ -23,7 +29,9 @@ class Message:
     @content.setter
     def content(self, value):
         if not isinstance(value, str) or not value.strip():
-            raise ValueError("Content must be a non-empty string")
+            raise InvalidMessageError(
+                "Content must be a non-empty string"
+            )
         self._content = value
 
     def __str__(self):
@@ -38,6 +46,6 @@ class Message:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            role=data["role"],
+            role=data.get("role"),
             content=data.get("content"),
         )
