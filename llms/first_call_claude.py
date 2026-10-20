@@ -9,8 +9,14 @@ from dotenv import load_dotenv
 API_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 MODEL = "claude-haiku-5-5"
-MAX_TOKENS = 300
+MAX_TOKENS = 1024
 TIMEOUT_SECONDS = 30
+SYSTEM_PROMPT = (
+    "You are a concise assistant. "
+    "Answer in plain text without Markdown formatting, "
+    "because your answers are shown in a terminal. "
+    "If you don't know something, say so instead of guessing."
+)
 
 
 def load_api_key() -> str:
@@ -37,10 +43,14 @@ def build_messages(question: str) -> list[dict[str, str]]:
     ]
 
 
-def build_body(messages: list[dict[str, str]]) -> dict[str, Any]:
+def build_body(
+    messages: list[dict[str, str]],
+    system: str = SYSTEM_PROMPT,
+) -> dict[str, Any]:
     return {
         "model": MODEL,
         "max_tokens": MAX_TOKENS,
+        "system": system,
         "messages": messages,
     }
 
@@ -105,13 +115,12 @@ def main():
     data = send_request(headers, body)
 
     text = extract_text(data)
-    if text:
-        print(f"\n{text}")
-    else:
+    if not text:
         print("\n[No answer: the model used its whole token budget before responding.]")
-
-    if extract_stop_reason(data) == "max_tokens":
-        print(f"\nWarning: the answer was cut off at the token limit.")
+    else:
+        print(f"\n{text}")
+        if extract_stop_reason(data) == "max_tokens":
+            print("\n[Warning: the answer was cut off at the token limit.]")
 
     input_tokens, output_tokens = extract_usage(data)
     print(f"\nUsage: {input_tokens} input tokens, {output_tokens} output tokens.")
