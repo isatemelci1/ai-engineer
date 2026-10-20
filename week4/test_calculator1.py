@@ -1,5 +1,5 @@
 import pytest
-from calculator import square
+from calculator1 import square
 
 """ def main():
     test_square()
